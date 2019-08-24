@@ -4,28 +4,74 @@ import TodoInput from "./comp/inputForm"
 import List from "./comp/list"
 
 import "bootstrap/dist/css/bootstrap.min.css"
+import uuid from "uuid"
 
 export class App extends Component {
-  state = {
-    items : [],
-    edit : false,
-    item : ''
+  constructor(props){
+    super(props)
+    this.state = {
+      items : [],
+      edit : false,
+      item : '',
+      id: uuid()
+    }
   }
 
-  addItem = () =>{
-    // const newItem = <h2>  </h2>;
+  handleSubmit = (e) => {
+    e.preventDefault()
+    const newItem = {
+      item: this.state.item,
+      id: this.state.id
+    }
+
+    const newArray = [...this.state.items, newItem]
+    
     this.setState({
-      item : document.getElementById('newItem').value
-    });
-    //change the state of list
-    // ReactDOM.render(newItem, document.getElementById('temp'));
+      items: newArray,
+      edit: false,
+      item: '',
+      id: uuid()
+    })
+  }
+
+  handleChange = e => {
+    this.setState({
+      item: e.target.value
+    })
+  }
+
+  clearList = () => {
+    this.setState({
+      items: []
+    })
+  }
+
+  deleteItem = id => {
+    const newArray = this.state.items.filter((item) => item.id != id)
+    this.setState({
+      items: newArray
+    })
+
+  }
+
+  editItem = id =>{
+    const currItem = this.state.items.find((item) => item.id == id)
+    const newArray = this.state.items.filter((item) => item.id != id)
+    this.setState({
+      items: newArray,
+      id: currItem.id,
+      item: currItem.item,
+      edit: true
+    })
+
   }
 
   render() {
+    // if edit button, change item to value of text
     return (
       <div>
-        <TodoInput addItem={this.addItem} />
-        <List item={this.state.item}/>
+        <TodoInput handleSubmit={this.handleSubmit} edit={this.state.edit} item={this.state.item} handleChange={this.handleChange}/>
+        <List items={this.state.items} clearList={this.clearList} deleteItem={this.deleteItem} editItem={this.editItem}/>
       </div>
     )
   }
